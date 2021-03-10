@@ -1,0 +1,47 @@
+tplot_restore,filename='test_mom/test_mom.tplot'
+ylim,'*',1,100
+en='ENSPEC_SC4_IN0_PHI0_360_UNCOUNTS_SP3_ET0_All'
+ylim,en,40,4e4
+ot1='no_limit_original'
+ot2='en_limit_original'
+options,'*AVG*','thick',3
+options,'*','panel_size',1
+
+options,ot1+'_AVG300','color',3
+options,ot2+'_AVG300','color',2
+at1='no_limit_avg'
+at2='en_limit_avg'
+at3='large_ar'
+;at3='all_limit_avg'
+options,at1,'psym',1
+options,at2,'color',4
+options,at3,'color',1
+tfit='disf_fit'
+ctfit='disf_calc_pro'
+options,tfit,'color'
+options,tfit,'thick'
+
+;popen,'test_mom.ps',/land
+
+tplot,[en,ot1,ot2,at1,tfit]
+Tplot_Panel,V=Ot1,O=Ot1+'_Avg300'
+Tplot_Panel,V=Ot2,O=Ot2+'_Avg300'
+Tplot_Panel,V=At1,O=At2,Psym=1
+Tplot_Panel,V=At1,O=At3,Psym=1
+;Tplot_Panel,V=At1,O=Ot1+'_Avg300'
+;Tplot_Panel,V=At1,O=Ot2+'_Avg300'
+Tplot_Panel,V=Ot1,O=cTfit
+Tplot_Panel,V=Ot2,O=cTfit
+Tplot_Panel,V=At1,O=cTfit
+tplot_panel,v=tfit,o=ctfit
+Yline,En,Offset=200,Col=6
+Yline,En,Offset=800,Col=6
+
+;pclose
+
+;spawn,'mogrify -format png test_mom.ps'
+;spawn,'mogrify -rotate -90 test_mom.png'
+
+;energy=[251, 660]
+
+;tplot_save,filename='test_mom'

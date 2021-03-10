@@ -1,0 +1,114 @@
+;------------------ INPUT PARAMETERS ----------------------------------
+;sat:        Satellite number
+;            A single integer (1, 2, 3 or 4) indicating the 4 s/c
+;
+;specie:     0: H+, 1: He++, 2: He+, 3: O+
+;
+;inst:       Instrument (0: CODIF, 1: HIA)
+;
+;time:       Start date/time string in tplot format ('yyyy-mm-dd/hh:mm:ss')
+;timespan:   Set the time span
+;            (keywords: SECONDS, MINUTES, HOURS, DAYS (DEFAULT))
+;
+;units_name: The units should be 'Counts'
+;
+;eff_table:  0: Ground table, 1: OnBoard Table
+;---------------------------------------------------------------------
+sat   = 4
+specie= 3
+
+time='2002-10-01/06:05:00'
+timespan, time, 5, /minutes ; SECONDS, MINUTES, HOURS, DAYS (DEFAULT)
+
+erange=[40,40000]
+;erange=[251, 660]
+
+units_name='Counts'
+
+inst=0 ; 0: CODIF, 1: HIA (this is not supported for the moment)
+
+eff_table=0 ; 0: GROUND, 1: ONBOARD
+;----------------------------------------------------------------------
+
+;----------------------------------------------------------------------
+; Load/calculate the globe plot data
+; Keywords: CNES -> use CNES magnetic field data
+;           IC   -> use Imperial College magnetic field data
+; The PP (cdf format) magnetic field data is the default setting
+;----------------------------------------------------------------------
+
+plot_globe_from_crib, sat, $
+                      specie, $
+                      inst, $
+                      units_name, $
+                      BKG=0, $
+                      eff_table, $
+                      OLD_EFF=0, $
+                      CNES=0, $
+                      IC=0
+
+name = 'GLOBE_SC'+string(sat,format='(i1.1)')+$
+       '_'+strcompress(units_name, /remove_all)  +$
+       '*'+'SP'+string(specie,format='(i1.1)')
+
+tplot_names,name, names=gname
+
+get_data, gname(0), data=data
+;help,data.data
+;stop
+;----------------------------------------------------------------------
+; computing codif moments needed for slice2d_mpe
+; Keywords: NAME -> specify other that the default tplot variable name
+;           INST_COORD -> Calculate velocities in instrument coordinates
+;            RECALC -> Force recalculation instead of reading
+;                      pre-processed data
+;----------------------------------------------------------------------
+angle=[[-90.0, 90.0], [0.0, 360.0]] ; bin range to sum over
+;get_data,'bins2',data=da
+;bins=da.bins
+energy=erange
+moments=['V']
+
+plot_3dmom_from_crib, sat, specie, inst, moments, angle, $
+                      energy, eff_table, $
+                      NEW_NAME='v_cod',  $
+                      INST_COORD = 1,    $
+                      RECALC = 1,        $
+                      OLD_EFF = 0,   	 $ 
+                      bins=bins,         $	
+	              use_bins=0
+
+;----------------------------------------------------------------------
+; to run slice2d_mpe, the 3D "data" must be in counts
+; Keyword: CUT_BULK_VEL -> get 1-D cut in the bulk velocity frame
+;          CUT_PERP     -> the value of vperp to make the 1d cut of vpara
+;          CUT_PARA     -> the value of vpara to make the 1d cut of vperp
+;----------------------------------------------------------------------
+window, /free, ysize=900
+
+slice2d_mpe, data,$
+             units = 'DIST FUNC', $
+             thebdata = 'B_xyz_codif', $
+             vel = 'v_cod', $
+             xrange=[-100,100], $
+             nosun=1, $
+             range=[5e-13, 5e-9], $
+             onecnt=0, $
+             ang = 20, $
+             gsexy = 0, $
+             gsexz = 0, $
+             gseyz = 0, $
+             plotenergy=0, $
+             nocross=0, $
+             nosmooth=0, $
+             nosubtract=1, $
+             noolines=0, $
+             finished=0, $
+             plotlabel = 0, $
+             cut_perp = 18, $
+             cut_par = 66.3, $
+             cut_bulk_vel = 0, $
+             erange = erange, $
+             double=0,$
+             showdata=0,$
+		zlog=1	

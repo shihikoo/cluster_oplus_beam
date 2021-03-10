@@ -1,0 +1,4 @@
+lobe_def = 1 * 60 * 60  ;seconds
+sc = 4
+beam_density_def = 5
+beam_v_def = -200 ;km/s

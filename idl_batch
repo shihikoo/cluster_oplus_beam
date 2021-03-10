@@ -1,0 +1,26 @@
+print,'Executing IDL_BATCH file'
+
+DEFINE_KEY, ESC=string([27B, 79B, 68B]), 'ALT_L', /BACK_CHAR
+DEFINE_KEY, ESC=string([27B, 79B, 67B]), 'ALT_R', /FORWARD_CHAR
+DEFINE_KEY, ESC=string([27B, 79B, 65B]), 'ALT_UP', /PREVIOUS_LINE
+DEFINE_KEY, ESC=string([27B, 79B, 66B]), 'ALT_DN', /NEXT_LINE
+
+!path=!path+':'+expand_path('/link/idl')
+!path = !path + ":" + $
+expand_path("+/u/gupta/idl/mylib") + ":" + $
+expand_path("+/u/mckee/bes") + ":" + $
+expand_path("/u/mckee/idl") + ":" + $
+expand_path("/u/rhodes/idl") + ":" + $
+expand_path("+/u/greenf/idl/public")
+
+cpu,tpool_nthread=1 
+
+ SET_PLOT, 'Z'
+   DEVICE, SET_PIXEL_DEPTH    = 24, $
+           SET_RESOLUTION     = [1024, 768], $
+           SET_CHARACTER_SIZE = [6, 10], $
+           Z_BUFFERING        = 0
+
+call_procedure,'plot_o_beam_day' 
+retall
+exit 
