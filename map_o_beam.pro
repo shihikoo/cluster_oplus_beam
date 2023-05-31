@@ -346,8 +346,7 @@ FOR i_storm_phase = 0, N_ELEMENTS(storm_phase_set)-1 DO BEGIN
 ;--------------------------------------------------------------------------------------------
 ;                                      Calculation and plot                                 ;
 ;--------------------------------------------------------------------------------------------
-;For MLT/ILAT plot, since magnetic field used for MLT and ILAT is
-;dipole field, only data at polar region
+;For MLT/ILAT plot, since magnetic field used for MLT and ILAT is dipole field, only data at polar region
         flag_phase_axis=flag_phase
         IF ARRAY_EQUAL(PLOT_AXIS(0:1), ['MLT', 'ILAT']) or  ARRAY_EQUAL(PLOT_AXIS(0:1), ['ILAT', 'MLT']) $
           THEN BEGIN
@@ -415,7 +414,7 @@ FOR i_storm_phase = 0, N_ELEMENTS(storm_phase_set)-1 DO BEGIN
                             if ARRAY_EQUAL(PLOT_AXIS(0:1), ['ILAT', 'MLT']) then begin
                                 temp=point_map_data(*,*,0)
                                 point_map_data(*,*,0)=point_map_data(*,*,1)
-                                point_map_data(*,*,1)=point_map_data(*,*,0)
+                                point_map_data(*,*,1)=temp
                             endif 
                             
                             IF KEYWORD_SET(ps_plot) THEN popen,  $

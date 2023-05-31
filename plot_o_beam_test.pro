@@ -58,7 +58,7 @@ dont_plot_sw_sheath = 1
 display_time = 2.*60*60
 path_set = ['original_setting', 'limit_no', 'limit_en', 'ar_2250', $
             'ar_3375', 'avg10min', 'avg15min']
-FOR ipath = 0, 6 DO  BEGIN
+FOR ipath = 0, 0 DO  BEGIN
     tplot_names, names = names
     store_data, delete = names
 
@@ -117,28 +117,38 @@ FOR ipath = 0, 6 DO  BEGIN
         
         IF nouse EQ 0 THEN BEGIN 
 ; identify O+ beam plot
-            find_o_beam, sc = sc, $
-                         average_time = average_time, $ 
-                         idl_plot = idl_plot, $
-                         ps = ps, $
-                         dumpdata = dumpdata, $
-                         globe_plot = globe_plot, $
-                         store_data = store_data, $
-                         plot_mom = plot_mom, $
-                         path = path, $
-                         plot_lowcount_filter =  plot_lowcount_filter, $         
-                         beam_recalc = beam_recalc, $
-                         mom_recalc = mom_recalc,  $
-                         find_phase = find_phase, $
-                         displaytime = display_time, $
-                         add_imf = add_imf, $
-                         dont_plot_sw_sheath = dont_plot_sw_sheath, $
-                         use_angle_range = use_angle_range, $
-                         use_energy_range = use_energy_range, $
-                         plot_imf = plot_imf, $
-                         beam_angle_range =  beam_angle_range, $
-                         dfit_temperature = dfit_temperature, $
-                         show_fit = show_fit
+         find_o_beam, sc = sc, $                                                  
+                     sp = sp,$                                                   
+                     average_time = average_time, $                              
+                     idl_plot = idl_plot, $                                      
+                     ps = ps, $                                                  
+                     dumpdata = dumpdata, $                                      
+                     globe_plot = globe_plot, $                                  
+                     store_data = store_data, $                                  
+                     beam_recalc = beam_recalc, $                               \
+                                                                                 
+                     mom_recalc = mom_recalc,  $                                 
+                     path = path, $                                              
+                     find_phase = find_phase, $                                  
+                     plot_lowcount_filter =  plot_lowcount_filter, $             
+                     displaytime = display_time, $                               
+                     plot_mom = plot_mom, $                                      
+                     add_imf = add_imf, $                                        
+                     plot_sw_sheath = plot_sw_sheath, $                          
+                     use_angle_range = use_angle_range, $                        
+                     use_energy_range = use_energy_range, $                      
+                     plot_imf = plot_imf, $                                      
+                     beam_angle_range =  beam_angle_range, $                     
+                     dfit_temperature = dfit_temperature, $                      
+                     show_fit = show_fit, $                                      
+                     inst_input = inst_input, $                                  
+                     add_eflux = add_eflux, $                                    
+                     add_anodes = add_anodes, $                                  
+                     use_hiabeta = use_hiabeta,$                                 
+                     only_in_lobe = only_in_lobe,$                               
+                     plot_add_distfunc_procedure = plot_add_distfunc_procedure,$ 
+                     add_distfunc = add_distfunc,$                               
+                     flux_threshold=flux_threshold 
         ENDIF 
 
         at_str = STRCOMPRESS(ROUND(average_time),  /REMOVE_ALL) 

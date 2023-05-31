@@ -1,14 +1,14 @@
-PRO find_pa_peak, pa_name_counts, pa_name, pap_name, def_pap = def, pa_counts_line = pa_counts_line,flux_threshold=flux_threshold
+PRO find_pa_peak, pa_name_counts, pa_name, pap_name, def = def, pa_counts_line = pa_counts_line,flux_threshold=flux_threshold
 
 if not keyword_set (flux_threshold) or n_elements(flux_threshold) ne 3 then flux_threshold=[10,15,18]
 IF NOT keyword_set(pa_counts_line) THEN pa_counts_line = 9/88.
 get_data, pa_name_counts, data = data
-counts_pa = data.y(*, 0:7)
+counts_pa = data.y;(*, 0:7)
 
 get_data, pa_name, data = data, dlim = dlim, lim = lim
 time_pa = data.x
-flux_pa = data.y(*, 0:7)
-pa_pa = data.v(*, 0:7)
+flux_pa = data.y;(*, 0:7)
+pa_pa = data.v;(*, 0:7)
 
 ntime = N_ELEMENTS(time_pa)
 npa = N_ELEMENTS(pa_pa(0, *))
@@ -56,7 +56,7 @@ flux_peak_pa(*, *) = !VALUES.F_NAN
 
 FOR i = 0, ntime-1 DO BEGIN 
     FOR j = 0, npa-1 DO BEGIN 
-        IF flux_pa(i, j) GE flux_pa(i, j-1 > 0) AND $
+        IF flux_pa(i, j) GE flux_pa(i, j-1 > 0)AND $
           flux_pa(i, j) GE flux_pa(i, j+1 < (npa-1)) AND $
           flux_pa(i, j) GT def_pap(i) AND $
           counts_pa(i, j) GT pa_counts_line $
@@ -71,4 +71,6 @@ pap_name = pa_name+'_PAP'
 store_data, pap_name, data = str, dlim = dlim, lim = lim
 options, pap_name, 'ytitle', 'PAP'
 zlim, pap_name, 0.1, 100
+
+stop
 END

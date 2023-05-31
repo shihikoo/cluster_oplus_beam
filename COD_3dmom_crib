@@ -1,0 +1,153 @@
+;------------------ INPUT PARAMETERS ----------------------------------
+; sat:        Satellite number
+;             An array of integers (1, 2, 3 or 4) indicating the 4 s/c
+;
+; specie:     0: H+, 1: He++, 2: He+, 3: O+
+;
+; moment:     'D': Density, 'V': Velocity, 'T': Temperature
+;             'P': Pressure, 'J': Flux, 'E': Energy Flux
+;
+; time:       Start date/time string in tplot format ('yyyy-mm-dd/hh:mm:ss')
+; timespan:   Set the time span
+;             (keywords: SECONDS, MINUTES, HOURS, DAYS (DEFAULT))
+;
+; inst:       Instrument (0: CODIF)
+;
+; angle:      Angle range to sum over [thetarange, phirange]
+; 
+;             THETA_88: [-78.75, -56.25, -33.75, -11.25,
+;                         11.25, 33.75, 56.25, 78.75]
+;
+;             PHI_88:   [11.25,  22.50,  33.75,  45.00,  56.25,
+;                        67.50,  78.75, 101.25, 112.50, 123.75,
+;                       135.00, 146.25, 157.50, 168.75, 191.25,
+;                       202.50, 213.75, 225.00, 236.25, 247.50,
+;                       258.75, 281.25, 292.50, 303.75, 315.00,
+;                       326.25, 337.50, 348.75]
+;
+;             THETA_24: [-78.75, -56.25, -33.75, -11.25,
+;                         11.25,  33.75,  56.25,  78.75]
+;
+;             PHI_24:   [45.0, 90.0, 135.0, 225.0, 270.0, 315.0]
+;
+; energy:   Energy range (maximum range 30 - 40000)
+;
+; eff_table:  0: Ground table, 1: OnBoard Table
+;
+; eph_sc:     (1,2,3,4) Spacecraft number to be used in ephemeris axis
+;
+; KEYWORDS: RECALC --> Possible values: 0 (default) or 1.
+;  	    	       Force recalculation (value 1) as opposed to 
+;		       using the pre-processed moments files (value 0).
+;		       This keyword should be set to 1 when the following
+;		       keywords are also set: FRS='MAG', INCRATES=1, BKG=1,
+;		       HE1_CLEAN=1, SPILL=1, INST_COORD=1
+;  	    FRS --> Possible values: 'DIAG' (default) or 'MAG'.
+;	    	    The 'DIAG' option uses the tensor diagonalization
+;		    in order to calculate the parallel and perpendicular
+;		    to the local magnetic field components of the 
+;		    temperature and pressure.
+;		    THE 'MAG' option uses the magnetic field in order to
+;		    deduce the parallel and perpendicular components of
+;		    the pressure and the temperature. It requires that the 
+;                   keyword RECALC is set to 1.
+;	    ERROR_BAR --> Possible values: 0 (default) or 1.
+;	    	      	  If set to 1 then the error bars will be plotted
+;			  If set to 0 the error bars will not be plotted
+;	    INCRATES --> Possible values: 0 (default) or 1
+;	    	     	 Set to 1 for high rate correction otherwise set it to 0
+;			 It requires that the keyword RECALC is set to 1.
+;	    INTERP_RATES --> Possible values: 0 (default) or 1
+;	    		     Set to 1 to use interpolation in the high rate
+;			     corrected products.
+; 			     It requires that the keywords RECALC and INCRATES
+;                            are set to 1.			     
+;	    BKG --> Possible values: 0 (default) or 1
+;	    	    Set to 1 in order to use the background subtraction for
+;		    inner magnetosphere intervals.
+;		    It requires that the keyword RECALC is set to 1.
+;	    HE1_CLEAN --> Possible values: 0 (default) or 1
+;	    	      	  Set to 1 in order to use the corrected (for H+
+;			  contamination) He+ density.
+;			  It requires that the keyword RECALC is set to 1.
+;	    SPILL --> Possible values 0 (default) or 1 (Obsolete).
+;           OLD_EFF --> Possible values 0 (default) or 1 (Obsolete).
+;           INST_COORD --> Possible values 0 (default) or 1.
+;	    	       	   Set to 1 in order to calculate the momnets in the
+;			   instrument coordinate system (where applicable).
+;			   It requires that the keyword RECALC is set to 1.
+;
+;----------------------------------------------------------------------
+;tplot_names,names=names
+;store_data,delete=names
+sat    = [4]
+specie = [0]
+moments = ['D']
+
+time='2011-03-22/13:00:00'
+timespan, time, 2, /h ; SECONDS, MINUTES, HOURS, DAYS (DEFAULT)
+
+inst=0 ; 0: CODIF, 1: HIA (this is not supported for the moment)
+
+angle=[[-90.0, 90.0], [0., 360.]] ; bin range to sum over
+
+bins=[88]
+
+energy=[30., 40000.]
+
+eff_table=0 ; 0: GROUND, 1: ONBOARD
+
+eph_sc = sat(n_elements(sat)-1) ; (1,2,3,4)
+;----------------------------------------------------------------------
+
+plot_3dmom_from_crib, sat, specie, inst, $
+                      moments, angle, $
+                      energy, eff_table, $
+                      recalc = 1, $
+		      frs = 'MAG', $ ; 'MAG' or 'DIAG'
+;		      error_bar = 1, $
+                      incrates = 0, $
+                      interp_rates = 0, $
+                      bkg = 0, $
+		      he1_clean = 0, $
+                      spill = 0, $
+                      old_eff = 0, $
+                      INST_COORD=0;,$
+		      ;bins = bins, $
+	              ;use_bins=0
+
+;----------------------------------------------------------------------
+; Read ephemeris information and plot ephemeris axis
+;----------------------------------------------------------------------
+get_cluster_ephemeris, eph_sc, /MLT, /L_SHELL_D, /ILAT_D, /DIST
+
+var_label = 'EPH_SC'+STRING(eph_sc, FORMAT='(i1.1)')+'_'
+var_label = var_label + ['MLT','L_SHELL_D','ILAT_D','DIST']
+tplot, var_label=var_label
+
+;----------------------------------------------------------------------
+; PLOT 3D moments
+;----------------------------------------------------------------------
+options,'*','psym',0
+tplot, ['*SPED*','TDMOM*']
+;tplot,[1,2,3]
+;timebar,'2002-08-16/11:36:39'
+stop
+plot_mag_from_crib,sat
+v_name='TDMOM_EN00030_03000_SC4_MTVELOCITY_SP3_ET0_All'
+v_perp,v_name
+get_data,v_name+'_V_PERP_T',data=data
+time=data.x
+vperp=data.y*1000. ;m
+B_NAME='MAG_SC4_B_xyz_gse_T'
+get_data,b_name,data=data
+b=interpol(data.y,data.x,time)*1e-9 ;T
+mass=1.67*1e-27*16  ;kg
+charge=1.6e-19  ;quark
+r=mass*vperp/charge/B/1000. ;km
+f=charge*B/mass
+t=1/(f/2/3.14)
+store_data,'gyro_f',data={x:time,y:f},lim={yrange:[0,0.15],ylog:0},dlim={ytitle:'gyro frequency'}
+store_data,'gyro_r',data={x:time,y:r},lim={yrange:[0,2000],ylog:0},dlim={ytitle:'gyro radius (km)'}
+store_data,'gyro_T',data={x:time,y:t},lim={yrange:[40,80],ylog:0},dlim={ytitle:'gyro T'}
+tplot,['gyro_r','gyro_f','gyro_T']
